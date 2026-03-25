@@ -1,4 +1,4 @@
-CREATE PROCEDURE [dbo].[spInvoices_Create]
+﻿CREATE   PROCEDURE [dbo].[spInvoices_Create]
     @CustomerId INT = NULL,
     @CustomerName NVARCHAR(200) = NULL,
     @Mobile NVARCHAR(20) = NULL,
@@ -31,38 +31,38 @@ BEGIN
 
     SET @InvoiceNo = @Prefix + RIGHT(N'0000' + CONVERT(NVARCHAR(10), @NextSeq), 4);
 
-    ;WITH ComputedItems AS (
-        SELECT
-            i.[ProductId],
-            i.[ProductName],
-            i.[ProductType],
-            i.[ModelNo],
-            i.[SerialNo],
-            i.[WarrantyMonths],
-            i.[WarrantyNote],
-            i.[Qty],
-            i.[Rate],
-            i.[DiscountType],
-            i.[DiscountValue],
-            CAST(
-                CASE
-                    WHEN i.[DiscountType] = N'%' AND i.[DiscountValue] IS NOT NULL THEN (i.[Qty] * i.[Rate]) * (i.[DiscountValue] / 100.0)
-                    WHEN i.[DiscountType] = N'RS' AND i.[DiscountValue] IS NOT NULL THEN i.[DiscountValue]
-                    ELSE 0
-                END
-            AS DECIMAL(10,2)) AS [DiscountAmount],
-            CAST(
-                (i.[Qty] * i.[Rate]) -
-                CASE
-                    WHEN i.[DiscountType] = N'%' AND i.[DiscountValue] IS NOT NULL THEN (i.[Qty] * i.[Rate]) * (i.[DiscountValue] / 100.0)
-                    WHEN i.[DiscountType] = N'RS' AND i.[DiscountValue] IS NOT NULL THEN i.[DiscountValue]
-                    ELSE 0
-                END
-            AS DECIMAL(10,2)) AS [Amount],
-            i.[InvoiceNote]
-        FROM @Items i
-    )
-    SELECT 1; -- keep CTE scope in SSDT happy
+    --;WITH ComputedItems AS (
+    --    SELECT
+    --        i.[ProductId],
+    --        i.[ProductName],
+    --        i.[ProductType],
+    --        i.[ModelNo],
+    --        i.[SerialNo],
+    --        i.[WarrantyMonths],
+    --        i.[WarrantyNote],
+    --        i.[Qty],
+    --        i.[Rate],
+    --        i.[DiscountType],
+    --        i.[DiscountValue],
+    --        CAST(
+    --            CASE
+    --                WHEN i.[DiscountType] = N'%' AND i.[DiscountValue] IS NOT NULL THEN (i.[Qty] * i.[Rate]) * (i.[DiscountValue] / 100.0)
+    --                WHEN i.[DiscountType] = N'RS' AND i.[DiscountValue] IS NOT NULL THEN i.[DiscountValue]
+    --                ELSE 0
+    --            END
+    --        AS DECIMAL(10,2)) AS [DiscountAmount],
+    --        CAST(
+    --            (i.[Qty] * i.[Rate]) -
+    --            CASE
+    --                WHEN i.[DiscountType] = N'%' AND i.[DiscountValue] IS NOT NULL THEN (i.[Qty] * i.[Rate]) * (i.[DiscountValue] / 100.0)
+    --                WHEN i.[DiscountType] = N'RS' AND i.[DiscountValue] IS NOT NULL THEN i.[DiscountValue]
+    --                ELSE 0
+    --            END
+    --        AS DECIMAL(10,2)) AS [Amount],
+    --        i.[InvoiceNote]
+    --    FROM @Items i
+    --)
+    --SELECT 1 FROM ComputedItems; -- keep CTE scope in SSDT happy
 
     DECLARE @SubTotal DECIMAL(10,2) =
         (SELECT ISNULL(SUM([Amount]), 0) FROM (
@@ -175,4 +175,3 @@ BEGIN
 
     SELECT @InvoiceId AS [InvoiceId], @InvoiceNo AS [InvoiceNo];
 END
-
